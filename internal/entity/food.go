@@ -7,16 +7,18 @@ type Food struct {
 	VariantId string `json:"variant_id"`
 	Name      string `json:"name"`
 	ImageUrl  string `json:"image_url"`
+	Unit      string `json:"unit"`
 	Price     string `json:"price"`
 	Qty       string `json:"qty"`
 	Ratings   string `json:"ratings"`
 }
 
-func NewFood(variantId, name, imageUrl, price, qty string) *Food {
+func NewFood(variantId, name, unit, imageUrl, price, qty string) *Food {
 	return &Food{
 		Id:        uuid.New().String(),
 		VariantId: variantId,
 		Name:      name,
+		Unit:      unit,
 		ImageUrl:  imageUrl,
 		Price:     price,
 		Qty:       qty,

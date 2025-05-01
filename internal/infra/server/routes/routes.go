@@ -23,7 +23,6 @@ func InitRoutes(e *echo.Echo, dbRepo repo.DatabaseRepo, storageRepo repo.Storage
 	buyer.POST("/signup", buyerHandler.SignUpHandler)
 	buyer.POST("/login", buyerHandler.LoginHandler)
 
-	farmer.POST("/create/category", farmerHandler.CreateFoodVariantHandler)
 	farmer.GET("/get/category/:id", farmerHandler.GetFoodVariantsHandler)
 	farmer.DELETE("/delete/category/:id", farmerHandler.DeleteFoodVariantHandler)
 
@@ -31,9 +30,13 @@ func InitRoutes(e *echo.Echo, dbRepo repo.DatabaseRepo, storageRepo repo.Storage
 	farmer.GET("/get/item/:id", farmerHandler.GetFoodsHandler)
 	farmer.DELETE("/delete/item/:id", farmerHandler.DeleteFoodHandler)
 
+	farmer.GET("/get/orders/:farmerId", farmerHandler.GetOrdersHandler)
+	farmer.DELETE("/delete/order/:orderId", farmerHandler.DeleteOrderHandler)
+
 	alert.POST("/moisture/high", alertHandler.MoistureHighAlertHandler)
 	alert.POST("/moisture/low", alertHandler.MoistureLowAlertHandler)
 
 	buyer.GET("/get/items", buyerHandler.GetAllFoodsHandler)
+	buyer.POST("/place/order", buyerHandler.CreateOrderHandler)
 
 }

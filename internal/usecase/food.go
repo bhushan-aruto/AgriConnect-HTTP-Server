@@ -23,7 +23,7 @@ func NewFoodUseCase(dbRepo repo.DatabaseRepo, stRepo repo.StorageRepo) *FoodUseC
 	}
 }
 
-func (u *FoodUseCase) CreateFood(variantId, name, qty, price, fileType string, fileSrc io.Reader) (int32, error) {
+func (u *FoodUseCase) CreateFood(variantId, name, unit, qty, price, fileType string, fileSrc io.Reader) (int32, error) {
 	exists, err := u.dbRepo.CheckFoodExists(variantId, name)
 
 	if err != nil {
@@ -38,6 +38,7 @@ func (u *FoodUseCase) CreateFood(variantId, name, qty, price, fileType string, f
 	f := entity.NewFood(
 		variantId,
 		name,
+		unit,
 		"",
 		price,
 		qty,
@@ -55,7 +56,7 @@ func (u *FoodUseCase) CreateFood(variantId, name, qty, price, fileType string, f
 		return 500, errors.New("error occurred with file storage")
 	}
 
-	f.ImageUrl = fmt.Sprintf("http://34.47.250.228:8080/%s", filePath)
+	f.ImageUrl = fmt.Sprintf("https://agriconnect.vsensetech.in/%s", filePath)
 
 	if err := u.dbRepo.CreateFood(f); err != nil {
 		log.Println(err)

@@ -26,4 +26,10 @@ type DatabaseRepo interface {
 	DeleteFood(foodId string) error
 
 	GetAllFoods() ([]*entity.Food, error)
+
+	GetBuyerDetails(buyerId string) (*entity.Buyer, error)
+	GetFoodQty(itemId string) (string, error)
+	CreateBuyerOrder(order *entity.Order, qty string) error
+	GetOrdersByFarmerId(farmerId string) ([]*entity.OrderResponse, error)
+	DeleteOrder(orderId string) error
 }

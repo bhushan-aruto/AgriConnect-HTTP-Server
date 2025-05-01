@@ -30,7 +30,7 @@ func (h *FarmerHandler) SignUpHandler(ctx echo.Context) error {
 		})
 	}
 
-	u := usecase.NewFormerUseCase(h.dbRepo)
+	u := usecase.NewFormerUseCase(h.dbRepo, h.storageRepo)
 
 	statusCode, err := u.SignUp(
 		req.Email,
@@ -63,7 +63,7 @@ func (h *FarmerHandler) LoginHandler(ctx echo.Context) error {
 		})
 	}
 
-	u := usecase.NewFormerUseCase(h.dbRepo)
+	u := usecase.NewFormerUseCase(h.dbRepo, h.storageRepo)
 
 	token, statusCode, err := u.Login(
 		req.Email,
@@ -82,68 +82,6 @@ func (h *FarmerHandler) LoginHandler(ctx echo.Context) error {
 		},
 	)
 
-}
-
-func (h *FarmerHandler) CreateFoodVariantHandler(ctx echo.Context) error {
-	req := new(models.CreateFoodVariantRequest)
-
-	req.Name = ctx.FormValue("name")
-	req.FarmerId = ctx.FormValue("farmer_id")
-
-	file, err := ctx.FormFile("file")
-
-	if err != nil {
-		return ctx.JSON(
-			400,
-			echo.Map{
-				"message": "file upload failed",
-			},
-		)
-	}
-
-	src, err := file.Open()
-
-	if err != nil {
-		return ctx.JSON(
-			500,
-			echo.Map{
-				"message": "filed to open the file",
-			},
-		)
-	}
-
-	defer src.Close()
-
-	u := usecase.NewFoodVariantUseCase(
-		h.dbRepo,
-		h.storageRepo,
-	)
-
-	fileNameArr := strings.Split(file.Filename, ".")
-
-	inputFileType := fileNameArr[len(fileNameArr)-1]
-
-	statusCode, err := u.CreateFoodVariant(
-		req.FarmerId,
-		req.Name,
-		inputFileType,
-		src,
-	)
-
-	if err != nil {
-		return ctx.JSON(
-			int(statusCode),
-			echo.Map{
-				"message": err.Error(),
-			},
-		)
-	}
-	return ctx.JSON(
-		int(statusCode),
-		echo.Map{
-			"message": "food variant created successfully",
-		},
-	)
 }
 
 func (h *FarmerHandler) GetFoodVariantsHandler(ctx echo.Context) error {
@@ -209,6 +147,7 @@ func (h *FarmerHandler) CreateFoodHandler(ctx echo.Context) error {
 	req := new(models.CreateFoodRequest)
 
 	req.Name = ctx.FormValue("name")
+	req.Unit = ctx.FormValue("unit")
 	req.Price = ctx.FormValue("price")
 	req.Qty = ctx.FormValue("qty")
 	req.VariantId = ctx.FormValue("variant_id")
@@ -246,6 +185,7 @@ func (h *FarmerHandler) CreateFoodHandler(ctx echo.Context) error {
 	statusCode, err := u.CreateFood(
 		req.VariantId,
 		req.Name,
+		req.Unit,
 		req.Qty,
 		req.Price,
 		inputFileType,
@@ -309,4 +249,41 @@ func (h *FarmerHandler) DeleteFoodHandler(ctx echo.Context) error {
 	return ctx.JSON(int(statusCode), echo.Map{
 		"message": "item deleted successfully",
 	})
+}
+
+func (h *FarmerHandler) GetOrdersHandler(ctx echo.Context) error {
+	farmerId := ctx.Param("farmerId")
+
+	u := usecase.NewOrderUseCase(
+		h.dbRepo,
+	)
+
+	orders, statusCode, err := u.GetOrdersByFarmerId(farmerId)
+
+	if err != nil {
+		return ctx.JSON(int(statusCode), echo.Map{
+			"message": err.Error(),
+		})
+	}
+
+	return ctx.JSON(int(statusCode), orders)
+}
+
+func (h *FarmerHandler) DeleteOrderHandler(ctx echo.Context) error {
+	orderId := ctx.Param("orderId")
+	u := usecase.NewOrderUseCase(
+		h.dbRepo,
+	)
+	statusCode, err := u.DeleteOrder(orderId)
+
+	if err != nil {
+		return ctx.JSON(int(statusCode), echo.Map{
+			"message": err.Error(),
+		})
+	}
+
+	return ctx.JSON(int(statusCode), echo.Map{
+		"message": "order deleted successfully",
+	})
+
 }

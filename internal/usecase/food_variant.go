@@ -3,7 +3,6 @@ package usecase
 import (
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"strings"
 
@@ -23,37 +22,13 @@ func NewFoodVariantUseCase(dbRepo repo.DatabaseRepo, stRepo repo.StorageRepo) *F
 	}
 }
 
-func (u *FoodVariant) CreateFoodVariant(farmerId, name, fileType string, fileSrc io.Reader) (int32, error) {
-	exists, err := u.dbRepo.CheckFoodVariantExists(farmerId, name)
-
-	if err != nil {
-		log.Println(err)
-		return 500, errors.New("error occurred with database")
-	}
-
-	if exists {
-		return 400, errors.New("food variant already exists")
-	}
+func (u *FoodVariant) CreateFoodVariant(farmerId, name, bannerImageUrl string) (int32, error) {
 
 	fv := entity.NewFoodVariant(
 		name,
 		farmerId,
-		"",
+		bannerImageUrl,
 	)
-
-	fileName := fmt.Sprintf("%s.%s", fv.Id, fileType)
-
-	filePath, err := u.storageRepo.SaveFoodVariantImage(
-		fileName,
-		fileSrc,
-	)
-
-	if err != nil {
-		log.Println(err)
-		return 500, errors.New("error occurred with file storage")
-	}
-
-	fv.BannerImageUrl = fmt.Sprintf("http://34.47.250.228:8080/%s", filePath)
 
 	if err := u.dbRepo.CreateFoodVariant(fv); err != nil {
 		log.Println(err)

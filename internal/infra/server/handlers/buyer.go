@@ -100,3 +100,35 @@ func (h *BuyerHandler) GetAllFoodsHandler(ctx echo.Context) error {
 		fs,
 	)
 }
+
+func (h *BuyerHandler) CreateOrderHandler(ctx echo.Context) error {
+
+	req := new(models.OrderRequest)
+
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(400, echo.Map{
+			"message": "invalid json request body",
+		})
+	}
+
+	u := usecase.NewOrderUseCase(
+		h.dbRepo,
+	)
+
+	statusCode, err := u.CreateOrder(
+		req.BuyerId,
+		req.ItemId,
+		req.Qty,
+		req.Address,
+	)
+
+	if err != nil {
+		return ctx.JSON(int(statusCode), echo.Map{
+			"message": err.Error(),
+		})
+	}
+
+	return ctx.JSON(int(statusCode), echo.Map{
+		"message": "order placed successfully",
+	})
+}
