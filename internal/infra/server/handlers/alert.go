@@ -15,7 +15,7 @@ func NewAlertHandler() *AlertHandler {
 func (h *AlertHandler) MoistureHighAlertHandler(ctx echo.Context) error {
 	level := ctx.QueryParam("level")
 	say := twiml.VoiceSay{
-		Message: "Soil moisture is high, please turn the motor on, the current soil moisture is " + level + ", Thank you for your time",
+		Message: "Soil moisture is high, please turn the motor off, the current soil moisture is " + level + ", Thank you for your time",
 	}
 
 	twimlResult, err := twiml.Voice([]twiml.Element{say})
@@ -33,7 +33,7 @@ func (h *AlertHandler) MoistureHighAlertHandler(ctx echo.Context) error {
 func (h *AlertHandler) MoistureLowAlertHandler(ctx echo.Context) error {
 	level := ctx.QueryParam("level")
 	say := twiml.VoiceSay{
-		Message: "Soil moisture is low, please turn the motor off, the current soil moisture is " + level + ", Thank you for your time",
+		Message: "Soil moisture is low, please turn the motor on, the current soil moisture is " + level + ", Thank you for your time",
 	}
 
 	twimlResult, err := twiml.Voice([]twiml.Element{say})

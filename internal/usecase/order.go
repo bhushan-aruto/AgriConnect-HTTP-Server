@@ -97,11 +97,14 @@ func (u *OrderUseCase) CreateOrder(
 		return 500, errors.New("error occurred with database")
 	}
 
-	u.twilioRepo.MakeOrderCall(
+	if err := u.twilioRepo.MakeOrderCall(
 		u.CallAnswerApi,
 		u.CallFrom,
 		phoneNumber,
-	)
+	); err != nil {
+		log.Println("error occured while making the call ", err.Error())
+
+	}
 
 	return 201, nil
 }
