@@ -8,7 +8,9 @@ import (
 )
 
 type Config struct {
-	DatabaseUrl string
+	CallAnswerApi string
+	CallFrom      string
+	DatabaseUrl   string
 }
 
 func getEnv(key string) string {
@@ -25,6 +27,8 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		DatabaseUrl: getEnv("DATABASE_URL"),
+		CallAnswerApi: getEnv("CALL_ANSWER_API"),
+		CallFrom:      getEnv("CALL_FROM"),
+		DatabaseUrl:   getEnv("DATABASE_URL"),
 	}
 }

@@ -1,21 +1,24 @@
 package routes
 
 import (
+	"github.com/bhushn-aruto/krushi-sayak-http-server/config"
 	"github.com/bhushn-aruto/krushi-sayak-http-server/internal/infra/server/handlers"
 	"github.com/bhushn-aruto/krushi-sayak-http-server/internal/repo"
 	"github.com/labstack/echo"
 )
 
-func InitRoutes(e *echo.Echo, dbRepo repo.DatabaseRepo, storageRepo repo.StorageRepo) {
-	farmerHandler := handlers.NewFormerHandler(dbRepo, storageRepo)
-	buyerHandler := handlers.NewBuyerHandler(dbRepo)
+func InitRoutes(e *echo.Echo, config *config.Config, dbRepo repo.DatabaseRepo, storageRepo repo.StorageRepo, twilioRepo repo.TwilioRepo) {
+	farmerHandler := handlers.NewFormerHandler(dbRepo, storageRepo, config.CallAnswerApi, config.CallFrom, twilioRepo)
+	buyerHandler := handlers.NewBuyerHandler(dbRepo, config.CallAnswerApi, config.CallFrom, twilioRepo)
 	alertHandler := handlers.NewAlertHandler()
+	orderNotifyHandler := handlers.NewOrderNotifyHandler()
 
 	e.Static("/public", "public")
 
 	farmer := e.Group("/farmer")
 	buyer := e.Group("/buyer")
 	alert := e.Group("/alert")
+	notification := e.Group("/notify")
 
 	farmer.POST("/signup", farmerHandler.SignUpHandler)
 	farmer.POST("/login", farmerHandler.LoginHandler)
@@ -38,5 +41,7 @@ func InitRoutes(e *echo.Echo, dbRepo repo.DatabaseRepo, storageRepo repo.Storage
 
 	buyer.GET("/get/items", buyerHandler.GetAllFoodsHandler)
 	buyer.POST("/place/order", buyerHandler.CreateOrderHandler)
+
+	notification.POST("/order", orderNotifyHandler.OrderNotifyHandler)
 
 }

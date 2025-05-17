@@ -115,6 +115,17 @@ func (repo *postgresRepo) GetFarmerForLogin(email string) (*entity.Farmer, error
 
 }
 
+func (repo *postgresRepo) GetFarmerPhoneNumberByFoodId(foodId string) (string, error) {
+	query := `SELECT f.phone_number
+			 FROM foods AS fo
+			 JOIN food_variants AS fv ON fo.food_variant_id = fv.variant_id
+			 JOIN farmers AS f ON fv.farmer_id = f.farmer_id
+             WHERE fo.food_id = $1`
+	var phoneNumber string
+	err := repo.pool.QueryRow(context.Background(), query, foodId).Scan(&phoneNumber)
+	return phoneNumber, err
+}
+
 func (repo *postgresRepo) CheckBuyerEmailExists(email string) (bool, error) {
 	query := `SELECT EXISTS (SELECT 1 FROM buyers WHERE email=$1)`
 	var exists bool

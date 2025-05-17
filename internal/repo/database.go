@@ -7,6 +7,7 @@ type DatabaseRepo interface {
 	CheckFarmerPhoneNumberExists(phNum string) (bool, error)
 	CreateFarmer(farmer *entity.Farmer) error
 	GetFarmerForLogin(email string) (*entity.Farmer, error)
+	GetFarmerPhoneNumberByFoodId(foodId string) (string, error)
 
 	CheckBuyerEmailExists(email string) (bool, error)
 	CheckBuyerPhoneNumberExists(phNum string) (bool, error)

@@ -8,12 +8,18 @@ import (
 )
 
 type BuyerHandler struct {
-	dbRepo repo.DatabaseRepo
+	dbRepo        repo.DatabaseRepo
+	callAnswerApi string
+	callFrom      string
+	twilioRepo    repo.TwilioRepo
 }
 
-func NewBuyerHandler(dbRepo repo.DatabaseRepo) *BuyerHandler {
+func NewBuyerHandler(dbRepo repo.DatabaseRepo, callAnswerApi, callFrom string, twilioRepo repo.TwilioRepo) *BuyerHandler {
 	return &BuyerHandler{
-		dbRepo: dbRepo,
+		dbRepo:        dbRepo,
+		callAnswerApi: callAnswerApi,
+		callFrom:      callFrom,
+		twilioRepo:    twilioRepo,
 	}
 }
 
@@ -113,6 +119,9 @@ func (h *BuyerHandler) CreateOrderHandler(ctx echo.Context) error {
 
 	u := usecase.NewOrderUseCase(
 		h.dbRepo,
+		h.callAnswerApi,
+		h.callFrom,
+		h.twilioRepo,
 	)
 
 	statusCode, err := u.CreateOrder(

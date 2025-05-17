@@ -5,6 +5,7 @@ import (
 	"github.com/bhushn-aruto/krushi-sayak-http-server/internal/infra/postgres"
 	"github.com/bhushn-aruto/krushi-sayak-http-server/internal/infra/server/routes"
 	"github.com/bhushn-aruto/krushi-sayak-http-server/internal/infra/storage"
+	"github.com/bhushn-aruto/krushi-sayak-http-server/internal/infra/twilio_app"
 	"github.com/labstack/echo"
 )
 
@@ -28,7 +29,11 @@ func StartApp(conf *config.Config) {
 
 	storageRepo.Init()
 
-	routes.InitRoutes(e, dbRepo, storageRepo)
+	twilioClient := twilio_app.NewTwilioClient()
+
+	trepo := twilio_app.NewTwilioRepo(twilioClient)
+
+	routes.InitRoutes(e, conf, dbRepo, storageRepo, trepo)
 
 	e.Logger.Fatal(e.Start("0.0.0.0:8080"))
 }

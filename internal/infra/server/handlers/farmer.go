@@ -10,14 +10,20 @@ import (
 )
 
 type FarmerHandler struct {
-	dbRepo      repo.DatabaseRepo
-	storageRepo repo.StorageRepo
+	dbRepo        repo.DatabaseRepo
+	storageRepo   repo.StorageRepo
+	callAnswerApi string
+	callFrom      string
+	twilioRepo    repo.TwilioRepo
 }
 
-func NewFormerHandler(dbRepo repo.DatabaseRepo, stRepo repo.StorageRepo) *FarmerHandler {
+func NewFormerHandler(dbRepo repo.DatabaseRepo, stRepo repo.StorageRepo, callAnswerApi, callFrom string, twilioRepo repo.TwilioRepo) *FarmerHandler {
 	return &FarmerHandler{
-		dbRepo:      dbRepo,
-		storageRepo: stRepo,
+		dbRepo:        dbRepo,
+		storageRepo:   stRepo,
+		callAnswerApi: callAnswerApi,
+		callFrom:      callFrom,
+		twilioRepo:    twilioRepo,
 	}
 }
 
@@ -256,6 +262,9 @@ func (h *FarmerHandler) GetOrdersHandler(ctx echo.Context) error {
 
 	u := usecase.NewOrderUseCase(
 		h.dbRepo,
+		h.callAnswerApi,
+		h.callFrom,
+		h.twilioRepo,
 	)
 
 	orders, statusCode, err := u.GetOrdersByFarmerId(farmerId)
@@ -273,6 +282,9 @@ func (h *FarmerHandler) DeleteOrderHandler(ctx echo.Context) error {
 	orderId := ctx.Param("orderId")
 	u := usecase.NewOrderUseCase(
 		h.dbRepo,
+		h.callAnswerApi,
+		h.callFrom,
+		h.twilioRepo,
 	)
 	statusCode, err := u.DeleteOrder(orderId)
 

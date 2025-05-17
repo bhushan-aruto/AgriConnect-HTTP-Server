@@ -10,12 +10,18 @@ import (
 )
 
 type OrderUseCase struct {
-	dbRepo repo.DatabaseRepo
+	dbRepo        repo.DatabaseRepo
+	CallAnswerApi string
+	CallFrom      string
+	twilioRepo    repo.TwilioRepo
 }
 
-func NewOrderUseCase(dbRepo repo.DatabaseRepo) *OrderUseCase {
+func NewOrderUseCase(dbRepo repo.DatabaseRepo, CallAnswerApi, CallFrom string, twilioRepo repo.TwilioRepo) *OrderUseCase {
 	return &OrderUseCase{
-		dbRepo: dbRepo,
+		dbRepo:        dbRepo,
+		twilioRepo:    twilioRepo,
+		CallAnswerApi: CallAnswerApi,
+		CallFrom:      CallFrom,
 	}
 }
 
@@ -83,6 +89,19 @@ func (u *OrderUseCase) CreateOrder(
 		log.Println("error occurred with database, Err: ", err.Error())
 		return 500, errors.New("error occurred with database")
 	}
+
+	phoneNumber, err := u.dbRepo.GetFarmerPhoneNumberByFoodId(itemId)
+
+	if err != nil {
+		log.Println("error occurred with database, Err: ", err.Error())
+		return 500, errors.New("error occurred with database")
+	}
+
+	u.twilioRepo.MakeOrderCall(
+		u.CallAnswerApi,
+		u.CallFrom,
+		phoneNumber,
+	)
 
 	return 201, nil
 }
